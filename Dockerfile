@@ -1,15 +1,15 @@
-FROM openresty/openresty:bionic
-RUN apt-get update &&                             \
-    apt-get install -y --no-install-recommends    \
-    gocr                                          \
-    tesseract-ocr                                 \
-    skalibs-dev                                   \
-    build-essential                               \
-    tesseract-ocr-rus
-#   git
-
-RUN apt-get install -y git
-
+FROM openresty/openresty:alpine-fat
+RUN apk update && apk add                       \
+  musl-dev                                      \
+  gcc                                           \
+  make                                          \
+  alpine-sdk                                    \
+  openssl-dev                                   \
+  skalibs                                       \
+  jq                                            \
+  tesseract-ocr-data-rus                        \
+  imagemagick                                   \
+  skalibs-dev
 WORKDIR /tmp
 RUN git clone https://github.com/jprjr/sockexec.git       \
     && cd sockexec                                        \
@@ -21,4 +21,11 @@ RUN git clone https://github.com/jprjr/idgaf          \
     && gcc -o /usr/local/bin/idgaf idgaf.c            \
     && rm -rf /tmp/idgaf /tmp/sockexec
 
-RUN opm install openresty/lua-resty-upload
+
+RUN opm install                                       \
+      bungle/lua-resty-template                       \
+      jprjr/lua-resty-exec                            \
+      agentzh/lua-resty-http                          \
+      thibaultcha/lua-resty-jit-uuid                  \
+      openresty/lua-resty-upload
+
