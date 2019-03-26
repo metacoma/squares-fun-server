@@ -22,6 +22,16 @@ RUN git clone https://github.com/jprjr/idgaf          \
     && rm -rf /tmp/idgaf /tmp/sockexec
 
 
+WORKDIR /tmp
+#ADD http://www-e.uni-magdeburg.de/jschulen/ocr/gocr-0.50.tar.gz /tmp/
+#RUN tar zxvf gocr-0.50.tar.gz
+#WORKDIR /tmp/gocr-0.50
+RUN git clone https://github.com/SureChEMBL/gocr      \
+    && cd gocr                                        \
+    && ./configure                                    \
+    && make                                           \
+    && make install
+
 RUN opm install                                       \
       bungle/lua-resty-template                       \
       jprjr/lua-resty-exec                            \
@@ -29,3 +39,10 @@ RUN opm install                                       \
       thibaultcha/lua-resty-jit-uuid                  \
       openresty/lua-resty-upload
 
+RUN luarocks install inspect
+
+ENV ENTRYPOINT_PATH /usr/local/bin/entrypoint.sh
+COPY entrypoint.sh $ENTRYPOINT_PATH
+COPY nginx/boxes /usr/local/openresty/site/lualib/boxes
+COPY bin /opt/objects/bin
+ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
